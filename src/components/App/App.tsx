@@ -24,6 +24,8 @@ const App = () => {
     enabled,
     staleTime: 1000 * 60 * 3,
     retry: 1,
+
+    placeholderData: (prev) => prev,
   });
 
   useEffect(() => {
@@ -48,7 +50,6 @@ const App = () => {
       {(isLoading || isFetching) && <Loader />}
       {isError && <ErrorMessage />}
 
-      {/* ⬆️ ПАГІНАЦІЯ ПЕРЕД ҐРІДОМ */}
       {totalPages > 1 && (
         <ReactPaginate
           pageCount={totalPages}

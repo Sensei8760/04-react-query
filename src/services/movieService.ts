@@ -1,21 +1,39 @@
-import { api } from './api';
-import type { MoviesResponse } from '../types/movie';
+import axios from 'axios';
+import type { Movie } from '../types/movie';
 
-
-interface FetchMoviesParams {
-query: string;
-page?: number;
+interface MoviesResponse {
+  results: Movie[];
+  total_pages: number;
 }
 
+interface FetchMoviesParams {
+  query: string;
+  page: number;
+}
 
-export async function fetchMovies({ query, page = 1 }: FetchMoviesParams) {
-const { data } = await api.get<MoviesResponse>('/search/movie', {
-params: {
-query,
-page,
-include_adult: false,
-language: 'en-US',
-},
-});
-return data;
+export async function fetchMovies(
+  { query, page }: FetchMoviesParams
+): Promise<MoviesResponse> {
+  const token = import.meta.env.VITE_TMDB_TOKEN as string | undefined;
+  if (!token) {
+    throw new Error('Missing VITE_TMDB_TOKEN environment variable');
+  }
+
+  const { data } = await axios.get<MoviesResponse>(
+    'https://api.themoviedb.org/3/search/movie',
+    {
+      params: {
+        query,
+        include_adult: false,
+        language: 'en-US',
+        page,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    }
+  );
+
+  return data;
 }
