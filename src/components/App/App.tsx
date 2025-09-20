@@ -27,29 +27,27 @@ const App = () => {
     placeholderData: (prev) => prev,
   });
 
-  // Toast on fetch error (already required by the task)
+  // показ тоста при помилці
   useEffect(() => {
     if (enabled && isError) {
       toast.error('Something went wrong. Please try again.');
     }
   }, [isError, enabled]);
 
-  // Toast when request is successful but no movies found
+  const totalPages = data?.total_pages ?? 0;
+  const movies = data?.results ?? [];
+
+  // показ тоста, коли запит успішний, але результатів немає
   useEffect(() => {
     if (!enabled) return;
 
-    const noResults =
-      !!data &&
-      (data.total_results === 0 || (data.results?.length ?? 0) === 0);
+    const noResults = !!data && movies.length === 0;
 
-    if (!isLoading && !isFetching && noResults) {
+    if (!isLoading && !isFetching && !isError && noResults) {
       toast('No movies found for your query', { id: 'no-results' });
       setSelectedMovie(null);
     }
-  }, [enabled, data, isLoading, isFetching]);
-
-  const totalPages = data?.total_pages ?? 0;
-  const movies = data?.results ?? [];
+  }, [enabled, data, movies.length, isLoading, isFetching, isError]);
 
   const handleSearch: SearchBarProps['onSubmit'] = (newQuery) => {
     const trimmed = newQuery.trim();
