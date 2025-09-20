@@ -24,13 +24,29 @@ const App = () => {
     enabled,
     staleTime: 1000 * 60 * 3,
     retry: 1,
-
     placeholderData: (prev) => prev,
   });
 
+  // Toast on fetch error (already required by the task)
   useEffect(() => {
-    if (enabled && isError) toast.error('Something went wrong. Please try again.');
+    if (enabled && isError) {
+      toast.error('Something went wrong. Please try again.');
+    }
   }, [isError, enabled]);
+
+  // Toast when request is successful but no movies found
+  useEffect(() => {
+    if (!enabled) return;
+
+    const noResults =
+      !!data &&
+      (data.total_results === 0 || (data.results?.length ?? 0) === 0);
+
+    if (!isLoading && !isFetching && noResults) {
+      toast('No movies found for your query', { id: 'no-results' });
+      setSelectedMovie(null);
+    }
+  }, [enabled, data, isLoading, isFetching]);
 
   const totalPages = data?.total_pages ?? 0;
   const movies = data?.results ?? [];
